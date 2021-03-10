@@ -1,11 +1,19 @@
 package com.example.mashbox
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mashbox.UI.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,11 +21,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+        val fileLocationDataBase = RoomFileLocationDataBase.getDatabase(context = applicationContext)
+        val fileLocationDao  = fileLocationDataBase.getdDao()
+        val repository = FileLocationRepository(fileLocationDao)
+        val viewModelFactory = PageViewModelFactory(applicationContext,repository)
+        val viewModel = ViewModelProviders.of(this, viewModelFactory).get(PageViewModel::class.java)
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+        val adapter = ShowImagesAdapter()
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        viewModel.fileList.observe(this, Observer { list ->
+            run {
+                adapter.list = list
+                Log.d("newList",list.size.toString())
+                adapter.notifyDataSetChanged()
+            }
+        })
+
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

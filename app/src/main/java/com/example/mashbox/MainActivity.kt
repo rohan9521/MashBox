@@ -1,5 +1,6 @@
 package com.example.mashbox
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -15,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mashbox.UI.*
 
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity : AppCompatActivity(),onClick {
+    lateinit private var mediaPlayer: MediaPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,8 +27,8 @@ class MainActivity : AppCompatActivity() {
         val repository = FileLocationRepository(fileLocationDao)
         val viewModelFactory = PageViewModelFactory(applicationContext,repository)
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(PageViewModel::class.java)
-
-        val adapter = ShowImagesAdapter()
+        mediaPlayer = MediaPlayer()
+        val adapter = ShowImagesAdapter( this)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -55,8 +57,21 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
+
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onClickListener(fileLocationEntity: FileLocationEntity) {
+        if(mediaPlayer.isPlaying){
+            mediaPlayer.stop()
+            mediaPlayer.reset()
+
+
+        }
+        mediaPlayer. setDataSource(fileLocationEntity.location)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
     }
 }

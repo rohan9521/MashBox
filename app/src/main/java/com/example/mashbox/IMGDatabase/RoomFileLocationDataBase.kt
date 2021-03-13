@@ -23,7 +23,7 @@ abstract class RoomFileLocationDataBase: RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                    RoomFileLocationDataBase::class.java,
-                    "FileLocationTable"
+                    "MusicFileLocationTable"
                 ).build()
                 INSTANCE = instance
                 // return instance
